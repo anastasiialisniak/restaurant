@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { tokenInterceptor } from './auth/token.interceptor';
+import { groupOrderMockInterceptor } from './shared/mocks/group-orders/group-order-mock.interceptor';
 import { provideDaterangepickerLocale } from 'ngx-daterangepicker-bootstrap';
 
 import { environment } from '../environments/environment';
@@ -13,7 +14,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withXhr(), withInterceptors([tokenInterceptor])),
+    provideHttpClient(withXhr(), withInterceptors([groupOrderMockInterceptor, tokenInterceptor])),
     provideDaterangepickerLocale({
       separator: ' - ',
       applyLabel: 'Apply',
