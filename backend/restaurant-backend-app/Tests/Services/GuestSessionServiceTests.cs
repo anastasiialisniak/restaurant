@@ -806,6 +806,53 @@ public class GuestSessionServiceTests
 
     [Theory]
     [AutoData]
+    public async Task DeleteGuestSessionAsync_SnapshotClassifiesOwnerAndGuestSessions(
+        string userId,
+        string groupReservationId,
+        GroupReservation group,
+        Reservation reservation,
+        GuestSession sessionToDelete,
+        GuestSession ownerSession,
+        GuestSession guestSession)
+    {
+        group.GroupReservationId = groupReservationId;
+        group.ReservationId = reservation.Id;
+        reservation.CustomerId = userId;
+        sessionToDelete.GroupReservationId = groupReservationId;
+        ownerSession.GroupReservationId = groupReservationId;
+        ownerSession.IsOwnerSession = true;
+        ownerSession.Dishes = [];
+        guestSession.GroupReservationId = groupReservationId;
+        guestSession.IsOwnerSession = false;
+        guestSession.Dishes = [];
+
+        _mockGroupReservationRepository
+            .Setup(r => r.GetGroupReservationByIdAsync(groupReservationId))
+            .ReturnsAsync(group);
+        _mockReservationRepository
+            .Setup(r => r.GetReservationByIdAsync(reservation.Id))
+            .ReturnsAsync(reservation);
+        _mockGuestSessionRepository
+            .Setup(r => r.GetByGuestSessionId(sessionToDelete.Id))
+            .ReturnsAsync(sessionToDelete);
+        _mockGuestSessionRepository
+            .Setup(r => r.GetAllByGroupReservationIdAsync(groupReservationId))
+            .ReturnsAsync([ownerSession, guestSession]);
+        _mockDishRepository
+            .Setup(r => r.GetDishesByIdsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([]);
+
+        var result = await _guestSessionService.DeleteGuestSessionAsync(userId, groupReservationId, sessionToDelete.Id);
+
+        Assert.Equal(2, result.Participants.Count());
+        Assert.Equal(ParticipantType.Owner, result.Participants.Single(p => p.Id == ownerSession.Id).Type);
+        Assert.Equal(ParticipantType.Guest, result.Participants.Single(p => p.Id == guestSession.Id).Type);
+        Assert.Equal(0, result.Total);
+        _mockGuestSessionRepository.Verify(r => r.DeleteAsync(sessionToDelete), Times.Once);
+    }
+
+    [Theory]
+    [AutoData]
     public async Task GetAllSessionsAsync_NonOwner_ThrowsForbidden(string userId, string otherUserId, GroupReservation group, Reservation reservation)
     {
         group.ReservationId = reservation.Id;

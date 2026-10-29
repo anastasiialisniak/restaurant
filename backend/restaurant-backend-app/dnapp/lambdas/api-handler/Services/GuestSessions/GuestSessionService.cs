@@ -210,7 +210,8 @@ public class GuestSessionService(
             }).ToArray();
 
             decimal total = items.Sum(i => i.Quantity * i.Dish.Price);
-            var participant = new Participant(guestSession.Id, ParticipantType.Guest, guestSession.GuestName, items, total, guestSession.IsSubmitted);
+            var participantType = guestSession.IsOwnerSession ? ParticipantType.Owner : ParticipantType.Guest;
+            var participant = new Participant(guestSession.Id, participantType, guestSession.GuestName, items, total, guestSession.IsSubmitted);
             participants.Add(participant);
         }
 
