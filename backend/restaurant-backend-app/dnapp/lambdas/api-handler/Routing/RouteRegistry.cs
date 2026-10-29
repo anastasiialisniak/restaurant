@@ -169,6 +169,7 @@ public static class RouteRegistry
             new RouteHandler(new Route(HttpMethods.GET, "/reservations/{reservationId}"), ActivatorUtilities.CreateInstance<GetReservationByIdHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.PATCH, "/reservations/{reservationId}/status"), ActivatorUtilities.CreateInstance<UpdateReservationStatusHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.GET, "/reservations/{reservationId}/feedback"), ActivatorUtilities.CreateInstance<GetFeedbackForReservationHandler>(provider)),
+            new RouteHandler(new Route(HttpMethods.GET, "/reservations/{reservationId}/guest-session-id"), ActivatorUtilities.CreateInstance<GetOwnerGuestSessionIdHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.DELETE, "/reservations"), ActivatorUtilities.CreateInstance<CancelReservationHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.PUT, "/reservations"), ActivatorUtilities.CreateInstance<EditReservationHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.PATCH, "/reservations/{reservationId}/table"), ActivatorUtilities.CreateInstance<UpdateReservationTableHandler>(provider)),            
@@ -192,9 +193,11 @@ public static class RouteRegistry
             new RouteHandler(new Route(HttpMethods.POST, "/guest/sessions/{guestSessionId}/submit"), ActivatorUtilities.CreateInstance<SubmitGuestCartHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.GET, "/guest/sessions/{guestSessionId}/menu"), ActivatorUtilities.CreateInstance<GetGuestSessionMenuHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.GET, "/guest/groups/{groupReservationId}/status"), ActivatorUtilities.CreateInstance<GetGroupReservationStatusHandler>(provider)),
+            new RouteHandler(new Route(HttpMethods.GET, "/guest/groups/{groupReservationId}/sessions"), ActivatorUtilities.CreateInstance<GetAllGuestSessionsHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.GET, "/guest/invites/{token}"), ActivatorUtilities.CreateInstance<GetGroupReservationHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.GET, "/reservations/{reservationId}/invite-token"), ActivatorUtilities.CreateInstance<GetInviteTokenHandler>(provider)),
-            new RouteHandler(new Route(HttpMethods.DELETE, "/guest/groups/{groupReservationId}/sessions/{guestSessionId}"), ActivatorUtilities.CreateInstance<DeleteGuestSessionHandler>(provider))
+            new RouteHandler(new Route(HttpMethods.DELETE, "/guest/groups/{groupReservationId}/sessions/{guestSessionId}"), ActivatorUtilities.CreateInstance<DeleteGuestSessionHandler>(provider)),
+            new RouteHandler(new Route(HttpMethods.POST, "/group-reservations/{groupReservationId}/submit"), ActivatorUtilities.CreateInstance<SubmitGroupReservationHandler>(provider))
         ];
         List<RouteHandler> GetAuxiliaryRoutes() => [
             new RouteHandler(new Route(HttpMethods.GET, "/feedback"), ActivatorUtilities.CreateInstance<GetFeedbackForLocationHandler>(provider)),

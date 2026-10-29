@@ -1,4 +1,5 @@
 using APIHandler.Models.GuestSessions;
+using APIHandler.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,6 +15,9 @@ public interface IGuestSessionService
     Task SubmitCartAsync(string guestSessionId);
     Task<GuestMenuResponse> GetGuestMenuAsync(string guestSessionId);
     Task<GetAllSessionsResponse> DeleteGuestSessionAsync(string userId, string groupReservationId, string guestSessionId);
+    Task<GetAllSessionsResponse> GetAllSessionsAsync(string userId, string groupReservationId);
+    Task<GuestSessionIdResponse> GetOwnerGuestSessionIdAsync(string userId, string reservationId);
+    Task<List<ConsolidatedDishResponse>> SubmitGroupReservationAsync(string userId, string groupReservationId, string reservationId);
     Task<GetGuestSessionResponse> GetGuestSessionInfoAsync(string guestSessionId);
 }
 
