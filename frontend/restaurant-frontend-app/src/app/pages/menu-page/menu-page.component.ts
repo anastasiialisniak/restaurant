@@ -1,6 +1,7 @@
 import {Component, OnInit, ChangeDetectionStrategy, inject} from '@angular/core';
 import { DishCardComponent } from '@app/shared/custom-components/dish-card/dish-card.component';
 import { DishesService } from '@app/services/dishes/dishes.service';
+import { getDishImageUrl } from '@app/shared/mappers/dish-image.mapper';
 import { DishListResponse } from '@app/models/dishes/dish-list-response.model';
 import { MainCoverImageComponent } from '@app/shared/custom-components/main-cover-image/main-cover-image.component';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
@@ -81,7 +82,7 @@ export class MenuPageComponent implements OnInit {
     this.dishesService.getDishes(category, sort).subscribe((data) => {
       this.dishes = data.map((dish) => ({
         ...dish,
-        imageUrl: dish.imageUrl || 'assets/img/dish.png',
+        imageUrl: getDishImageUrl(dish),
         name: dish.name || 'Unknown Dish',
         price: dish.price || 0,
         weight: dish.weight || 'N/A',

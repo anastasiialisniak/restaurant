@@ -1,14 +1,15 @@
 export type ParticipantType = 'Owner' | 'Guest';
 
-export interface ParticipantDish {
+export interface DishShort {
   id: string;
   name: string;
   price: number;
-  imageUrl?: string | null;
+  imageUrl?: string;
+  weight?: string;
 }
 
 export interface ParticipantItem {
-  dish: ParticipantDish;
+  dish: DishShort;
   quantity: number;
 }
 
@@ -16,7 +17,7 @@ export interface Participant {
   id: string;
   type: ParticipantType;
   name: string;
-  isSubmitted: boolean;
-  total: number;
   items: ParticipantItem[];
+  total: number;
+  isSubmitted: boolean;
 }

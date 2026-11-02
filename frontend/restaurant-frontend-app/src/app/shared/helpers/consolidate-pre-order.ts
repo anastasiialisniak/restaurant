@@ -1,32 +1,33 @@
-import { Participant } from '@app/models/group-orders/participant.model';
-
-export interface ConsolidatedDish {
-  dishId: string;
+export interface Dish {
+  id: string;
   name: string;
   price: number;
-  quantity: number;
 }
 
-export function consolidatePreOrder(participants: Participant[]): ConsolidatedDish[] {
-  const dishes = new Map<string, ConsolidatedDish>();
+export interface Participant {
+  id: string;
+  name: string;
+  isSubmitted: boolean;
+  items: { dish: Dish; quantity: number }[];
+}
 
-  for (const participant of participants) {
-    if (!participant.isSubmitted) continue;
+export interface ConsolidatedOrder {
+  items: { dish: Dish; quantity: number }[];
+  total: number;
+}
 
+export function consolidatePreOrder(participants: Participant[]): ConsolidatedOrder {
+  const byDish = new Map<string, { dish: Dish; quantity: number }>();
+
+  for (const participant of participants.filter((person) => person.isSubmitted)) {
     for (const item of participant.items) {
-      const current = dishes.get(item.dish.id);
-      if (current) {
-        current.quantity += item.quantity;
-      } else {
-        dishes.set(item.dish.id, {
-          dishId: item.dish.id,
-          name: item.dish.name,
-          price: item.dish.price,
-          quantity: item.quantity,
-        });
-      }
+      const existing = byDish.get(item.dish.id);
+      // завжди НОВИЙ об'єкт — вхідні дані не змінюються
+      byDish.set(item.dish.id, { dish: item.dish, quantity: (existing?.quantity ?? 0) + item.quantity });
     }
   }
 
-  return [...dishes.values()];
+  const items = [...byDish.values()];
+  const total = items.reduce((sum, item) => sum + item.dish.price * item.quantity, 0);
+  return { items, total };
 }

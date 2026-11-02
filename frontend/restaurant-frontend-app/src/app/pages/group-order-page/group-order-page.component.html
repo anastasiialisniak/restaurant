@@ -70,10 +70,10 @@
 
       <section class="consolidated" aria-labelledby="consolidated-title">
         <h2 id="consolidated-title">Consolidated pre-order</h2>
-        @if (consolidatedOrder().length) {
+        @if (consolidatedOrder().items.length) {
           <ul class="consolidated-items">
-            @for (dish of consolidatedOrder(); track dish.dishId) {
-              <li><span>{{ dish.name }} × {{ dish.quantity }}</span><span>{{ dish.price * dish.quantity | currency }}</span></li>
+            @for (dish of consolidatedOrder().items; track dish.dish.id) {
+              <li><span>{{ dish.dish.name }} × {{ dish.quantity }}</span><span>{{ dish.dish.price * dish.quantity | currency }}</span></li>
             }
           </ul>
         } @else {
@@ -84,7 +84,7 @@
       <footer class="order-total">
         <p class="grand-total"><span>Grand Total</span><span>{{ grandTotal() | currency }}</span></p>
         @if (!isReadOnly()) {
-          <button class="submit-button" type="button" [disabled]="submitting() || consolidatedOrder().length === 0" (click)="openConfirmation()">Submit Pre-Order</button>
+          <button class="submit-button" type="button" [disabled]="submitting() || consolidatedOrder().items.length === 0" (click)="openConfirmation()">Submit Pre-Order</button>
         }
       </footer>
     </section>

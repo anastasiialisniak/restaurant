@@ -71,7 +71,7 @@ export const groupOrderMockInterceptor: HttpInterceptorFn = (request, next) => {
 
   if (request.method === 'POST' && path.endsWith(`/group-reservations/${DEMO_GROUP_ID}/submit`)) {
     submitted = true;
-    const result: GroupOrderDish[] = consolidatePreOrder(demoParticipants()).map(({ dishId, quantity }) => ({ dishId, quantity }));
+    const result: GroupOrderDish[] = consolidatePreOrder(demoParticipants()).items.map(({ dish, quantity }) => ({ dishId: dish.id, quantity }));
     return reply(result);
   }
 

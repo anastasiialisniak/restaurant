@@ -25,7 +25,11 @@
     <div class="dish-cards">
       @for (dish of dishes; track dish) {
         <a routerLink="/dish/{{ dish.id }}" routerLinkActive="router-link-active" class="dish-card">
-          <img [src]="dish.imageUrl" alt="{{ dish.name }}" class="dish-image" />
+          @if (dish.imageUrl) {
+            <img [src]="dish.imageUrl" alt="{{ dish.name }}" class="dish-image" />
+          } @else {
+            <div class="dish-image" aria-hidden="true"></div>
+          }
           <div class="dish-info">
             <div class="dish-name">{{ dish.name }}</div>
             <div class="dish-meta">

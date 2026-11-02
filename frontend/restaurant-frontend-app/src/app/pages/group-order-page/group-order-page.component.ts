@@ -49,7 +49,7 @@ export class GroupOrderPageComponent implements OnDestroy {
 
   readonly consolidatedOrder = computed(() => consolidatePreOrder(this.participants()));
   readonly grandTotal = computed(() =>
-    this.consolidatedOrder().reduce((total, dish) => total + dish.price * dish.quantity, 0),
+    this.consolidatedOrder().total,
   );
   readonly unsubmittedGuestCount = computed(
     () => this.participants().filter((person) => person.type === 'Guest' && !person.isSubmitted).length,
@@ -128,7 +128,7 @@ export class GroupOrderPageComponent implements OnDestroy {
   }
 
   openConfirmation(): void {
-    if (this.isReadOnly() || this.submitting() || this.consolidatedOrder().length === 0) return;
+    if (this.isReadOnly() || this.submitting() || this.consolidatedOrder().items.length === 0) return;
     this.confirmationOpen.set(true);
   }
 
@@ -138,7 +138,7 @@ export class GroupOrderPageComponent implements OnDestroy {
 
   submitPreOrder(): void {
     const invite = this.invite();
-    if (!invite || this.isReadOnly() || this.submitting() || this.consolidatedOrder().length === 0) return;
+    if (!invite || this.isReadOnly() || this.submitting() || this.consolidatedOrder().items.length === 0) return;
 
     this.stopPolling();
     this.submitting.set(true);

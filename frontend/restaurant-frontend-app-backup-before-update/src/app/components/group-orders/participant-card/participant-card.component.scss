@@ -1,0 +1,124 @@
+@use 'app/shared/styles/abstracts/colors' as color;
+
+:host {
+  display: block;
+}
+
+.card {
+  padding: 16px;
+  border-radius: 12px;
+  background: color.$neutral-0;
+}
+
+.title {
+  margin: 0 0 10px;
+  color: color.$neutral-900;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.chip {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+}
+
+.submitted {
+  background: color.$green-100;
+  color: color.$green-800;
+}
+
+.pending {
+  background: color.$orange-100;
+  color: color.$neutral-700;
+}
+
+.items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 0;
+  border-bottom: 1px solid color.$neutral-100;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.initial {
+  display: grid;
+  place-items: center;
+  background: color.$green-100;
+  color: color.$neutral-600;
+}
+
+.name,
+.qty,
+.price {
+  margin: 0;
+}
+
+.name {
+  min-width: 0;
+  color: color.$neutral-900;
+  overflow-wrap: anywhere;
+}
+
+.qty,
+.price {
+  white-space: nowrap;
+  color: color.$neutral-700;
+}
+
+.empty {
+  margin: 12px 0;
+  color: color.$neutral-600;
+}
+
+.subtotal {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid color.$neutral-100;
+  font-weight: 600;
+}
+
+@media (max-width: 375px) {
+  .card {
+    padding: 14px 10px;
+  }
+
+  .item {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    gap: 7px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .price {
+    grid-column: 2 / -1;
+    justify-self: end;
+  }
+}
+
+.card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.remove-button { padding: 2px 0 4px; border: 0; border-bottom: 1px solid currentColor; background: transparent; color: color.$neutral-900; font: inherit; cursor: pointer; white-space: nowrap; }
+

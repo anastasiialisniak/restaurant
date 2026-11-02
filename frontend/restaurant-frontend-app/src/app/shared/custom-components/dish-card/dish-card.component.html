@@ -11,7 +11,11 @@
     @if (isUnavailable()) {
       <div class="status-badge">{{ dishStateLabel() }}</div>
     }
-    <img [src]="dish().imageUrl" alt="{{ dish().name }}" class="dish-image" />
+    @if (dish().imageUrl) {
+      <img [src]="dish().imageUrl" alt="{{ dish().name }}" class="dish-image" />
+    } @else {
+      <div class="dish-image" aria-hidden="true"></div>
+    }
     <div class="dish-info">
       <div class="dish-heading">
         <div class="dish-name">{{ dish().name }}</div>

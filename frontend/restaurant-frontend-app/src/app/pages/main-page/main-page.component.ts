@@ -5,6 +5,7 @@ import { DishListResponse } from '@app/models/dishes/dish-list-response.model';
 import { LocationResponse } from '@app/models/locations/location-response.model';
 import { LocationsService } from '@app/services/locations/locations.service';
 import { DishesService } from '@app/services/dishes/dishes.service';
+import { getDishImageUrl } from '@app/shared/mappers/dish-image.mapper';
 import { LocationCardComponent } from '@app/shared/custom-components/location-card/location-card.component';
 import { ReservationService } from '@app/services/reservation/reservation.service';
 import { FeedbackWindowComponent } from '@app/components/reservations/feedback-window/feedback-window.component';
@@ -85,7 +86,7 @@ export class MainPageComponent implements OnInit {
     this.dishesService.getPopularDishes().subscribe((data) => {
       this.dishes = data.slice(0, 4).map((dish) => ({
         ...dish,
-        imageUrl: dish.imageUrl || 'assets/img/dish.png',
+        imageUrl: getDishImageUrl(dish),
         name: dish.name || 'Unknown Dish',
         price: dish.price || 0,
         weight: dish.weight || 'N/A',
