@@ -70,7 +70,7 @@ public class ReservationService : IReservationService
         await UpdateWaiterReservationsAsync(reservation.WaiterId, reservation.Id);
 
         if (request.GuestCount >= 2)
-            await _groupReservationService.CreateGroupReservationAsync(reservation.Id);
+            await _groupReservationService.CreateGroupReservationAsync(reservation.Id, reservation.CustomerId);
 
         return ReservationMapper.ToReservationResponse(reservation, location.Address);
     }

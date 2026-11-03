@@ -1,0 +1,3 @@
+# Image credits
+
+- **Green Salad** (`src/assets/img/dishes/green-salad.jpg`): photo by [You Le](https://unsplash.com/@le_y0u), [Fresh salad with cucumber, tomatoes, and carrots in a bowl](https://unsplash.com/photos/fresh-salad-with-cucumber-tomatoes-and-carrots-in-a-bowl-_ZuqlqSS1II). Used under the [Unsplash License](https://unsplash.com/license). Retrieved as a local JPEG on 2026-11-03; the app does not load the remote URL at runtime.

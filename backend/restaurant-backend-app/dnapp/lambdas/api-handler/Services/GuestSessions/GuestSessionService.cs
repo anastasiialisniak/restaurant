@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using APIHandler.Services.Notifications;
 
@@ -57,10 +58,10 @@ public class GuestSessionService(
             throw new GuestSessionExpiredException($"This pre-order session has expired or is no longer active. Current reservation status: '{reservation.Status}'.");
         }
 
-        int joinedGuestsCount = await countTask;
+        int currentParticipantCount = await countTask;
 
-        if (joinedGuestsCount + 1 >= reservation.GuestCount)
-            throw new GuestLimitExceededException($"Guest limit exceeded. Maximum capacity is {reservation.GuestCount}, but {joinedGuestsCount} guests have already joined.");
+        if (currentParticipantCount >= reservation.GuestCount)
+            throw new GuestLimitExceededException($"Guest limit exceeded. Maximum capacity is {reservation.GuestCount}, and {currentParticipantCount} participants have already joined.");
 
         byte[] tokenBytes = RandomNumberGenerator.GetBytes(32);
 
@@ -184,6 +185,11 @@ public class GuestSessionService(
         if (session.GroupReservationId != groupReservationId)
         {
             throw new ValidationException("Guest session does not belong to this group reservation.");
+        }
+
+        if (session.IsOwnerSession)
+        {
+            throw new ValidationException("The owner session cannot be removed.");
         }
 
         await guestSessionRepository.DeleteAsync(session);
@@ -329,10 +335,7 @@ public class GuestSessionService(
     private async Task<int> GetCurrentParticipantCountAsync(string groupReservationId)
     {
         var sessions = await guestSessionRepository.GetAllByGroupReservationIdAsync(groupReservationId);
-
-        // Owner is always 1 active participant. 
-        // If sessions is null/empty, it safely evaluates to 0 joined guests + 1 owner = 1.
-        return (sessions?.Count ?? 0) + 1;
+        return sessions.Count;
     }
 
     private async Task ValidateGroupReservationId(string groupReservationId) => await GetGroupReservationAndValidateAsync(groupReservationId);
@@ -402,9 +405,38 @@ public class GuestSessionService(
 
     public async Task CreateGroupOwnerSessionAsync(string userId, string groupReservationId)
     {
+        var sessions = await guestSessionRepository.GetAllByGroupReservationIdAsync(groupReservationId);
+        var existingOwnerSession = sessions.FirstOrDefault(session => session.IsOwnerSession);
+        if (existingOwnerSession is not null)
+        {
+            if (!string.Equals(existingOwnerSession.OwnerUserId, userId, StringComparison.Ordinal))
+            {
+                throw new ValidationException("The group reservation already has an owner session for a different user.");
+            }
+
+            return;
+        }
+
+        // Use a stable key so concurrent retries cannot create duplicate owner sessions,
+        // even if the group-reservation GSI has not yet returned a just-written session.
+        byte[] ownerSessionIdHash = SHA256.HashData(Encoding.UTF8.GetBytes($"owner-session:{groupReservationId}"));
+        string ownerSessionId = new Guid(ownerSessionIdHash.AsSpan(0, 16)).ToString();
+        var sessionWithOwnerId = await guestSessionRepository.GetByGuestSessionId(ownerSessionId);
+        if (sessionWithOwnerId is not null)
+        {
+            if (sessionWithOwnerId.IsOwnerSession
+                && sessionWithOwnerId.GroupReservationId == groupReservationId
+                && string.Equals(sessionWithOwnerId.OwnerUserId, userId, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            throw new ValidationException("The owner guest session identifier is already in use.");
+        }
+
         var session = new GuestSession()
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = ownerSessionId,
             GroupReservationId = groupReservationId,
             GuestName = "Owner",
             Dishes = [],

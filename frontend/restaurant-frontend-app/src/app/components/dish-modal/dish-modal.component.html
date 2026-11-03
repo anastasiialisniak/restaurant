@@ -1,27 +1,79 @@
-<div class="modal-overlay" 
-      tabindex="0" 
-      role="button" 
+<div class="modal-overlay" aria-hidden="true" (click)="onClose()"></div>
+
+<section
+  class="modal-content"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="dish-dialog-title"
+  aria-describedby="dish-dialog-description"
+  tabindex="-1"
+>
+  <header class="modal-toolbar">
+    <p class="modal-label">Dish details</p>
+    <button
+      class="close-button"
+      type="button"
+      aria-label="Close dish details"
       (click)="onClose()"
-      (keydown.enter)="onClose()"
-      (keydown.space)="onClose()"></div>
-<div class="modal-content">
-  <button class="close-button" (click)="onClose()">×</button>
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+  </header>
 
-  <img class="dish-image" [src]="dish.imageUrl" [alt]="dish.name" />
-
-  <h3 class="dish-name">{{ dish.name }}</h3>
-
-  <div class="dish-info">
-    <p class="dish-description">{{ dish.description }}</p>
-    <p><strong>Calories:</strong> {{ dish.calories }} kcal</p>
-    <p><strong>Protein:</strong> {{ dish.proteins }}</p>
-    <p><strong>Fats:</strong> {{ dish.fats }}g</p>
-    <p><strong>Carbohydrates:</strong> {{ dish.carbohydrates }}</p>
-    <p><strong>Vitamins and minerals:</strong> {{ dish.vitamins }}</p>
+  <div class="dish-image-frame">
+    @if (dish.imageUrl && !imageLoadFailed) {
+      <img class="dish-image" [src]="dish.imageUrl" [alt]="dish.name" (error)="onImageError()" />
+    } @else {
+      <div class="image-placeholder" role="img" [attr.aria-label]="dish.name + ' photo unavailable'">
+        <span>Photo unavailable</span>
+      </div>
+    }
   </div>
 
-  <div class="price-weight">
-    <span>{{ dish.price }}$</span>
-    <span>{{ dish.weight }}</span>
+  <div class="dish-details">
+    <div class="dish-heading">
+      <div class="dish-title-group">
+        <p class="section-eyebrow">Fresh from our kitchen</p>
+        <h2 id="dish-dialog-title" class="dish-name">{{ dish.name }}</h2>
+      </div>
+      <p class="dish-price">
+        <span>Price</span>
+        <strong>{{ dish.price | currency: 'USD' : 'symbol' : '1.2-2' }}</strong>
+      </p>
+    </div>
+
+    <p id="dish-dialog-description" class="dish-description">
+      {{ dish.description || 'No description available.' }}
+    </p>
+
+    <section class="nutrition-section" aria-labelledby="nutrition-title">
+      <h3 id="nutrition-title" class="nutrition-title">Serving &amp; nutrition</h3>
+      <dl class="nutrition-grid">
+        <div class="nutrition-item">
+          <dt>Weight</dt>
+          <dd>{{ formatMeasurement(dish.weight, 'g') }}</dd>
+        </div>
+        <div class="nutrition-item">
+          <dt>Calories</dt>
+          <dd>{{ formatMeasurement(dish.calories, 'kcal') }}</dd>
+        </div>
+        <div class="nutrition-item">
+          <dt>Protein</dt>
+          <dd>{{ formatMeasurement(dish.proteins, 'g') }}</dd>
+        </div>
+        <div class="nutrition-item">
+          <dt>Fats</dt>
+          <dd>{{ formatMeasurement(dish.fats, 'g') }}</dd>
+        </div>
+        <div class="nutrition-item">
+          <dt>Carbohydrates</dt>
+          <dd>{{ formatMeasurement(dish.carbohydrates, 'g') }}</dd>
+        </div>
+        <div class="nutrition-item vitamins-item">
+          <dt>Vitamins &amp; minerals</dt>
+          <dd>{{ dish.vitamins || 'Not listed' }}</dd>
+        </div>
+      </dl>
+    </section>
   </div>
-</div>
+</section>

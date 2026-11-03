@@ -9,7 +9,7 @@ namespace APIHandler.Services.GroupReservations;
 public interface IGroupReservationService
 {
     Task<GroupReservation> GetGroupReservationAsync(string groupReservationId);
-    Task<GroupReservation> CreateGroupReservationAsync(string reservationId);
+    Task<GroupReservation> CreateGroupReservationAsync(string reservationId, string? ownerUserId = null);
     Task UpdateGroupReservationStatusAsync(string groupReservationId, GroupReservationStatus status);
     Task DeleteGroupReservationAsync(string groupReservationId);
     Task<GetGroupReservationResponse> GetGroupReservationByTokenAsync(string token);

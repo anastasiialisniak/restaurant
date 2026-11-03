@@ -1,87 +1,282 @@
 @use 'app/shared/styles/abstracts/colors' as color;
-@use 'app/shared/styles/card' as card;
+
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
 
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 99;
+  inset: 0;
+  z-index: 0;
+  background: rgba(24, 35, 27, 0.58);
+  backdrop-filter: blur(3px);
 }
 
 .modal-content {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 31rem;
-  max-width: 90vw;
-  background: color.$neutral-100;
-  box-shadow: 0 0 0.625rem 0.25rem rgba(194, 194, 194, 0.5);
-  border-radius: 1.5rem;
-  padding: 1.5rem;
-  transform: translate(-50%, -50%);
+  z-index: 1;
   display: flex;
+  width: min(52rem, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
   flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(35, 35, 35, 0.08);
+  border-radius: 1.25rem;
+  background: color.$neutral-0;
+  box-shadow: 0 1.5rem 4rem rgba(15, 35, 22, 0.28);
+}
+
+.modal-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  min-height: 3.5rem;
+  flex: 0 0 auto;
   align-items: center;
-  isolation: isolate;
-  gap: 1.5rem;
-  z-index: 100;
-  height: auto;
-  overflow: hidden;
-
-  @media (max-width: 560px) {
-    padding: 1rem;
-    border-radius: 0;
-  }
-}
-
-.dish-image {
-  width: min(18.375rem, 40vw);
-  height: min(18.375rem, 40vw);
-  aspect-ratio: 1 / 1;
-  @include card.common-image(circle);
-  box-shadow: 0 0 0.625rem 0.25rem rgba(194, 194, 194, 0.5);
-
-  @media (max-width: 560px) {
-    width: 60%;
-    height: 60%;
-  }
-}
-
-.dish-name {
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: color.$neutral-900;
-  align-self: flex-start;
-  font-weight: 600;
-}
-
-.dish-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  width: 100%;
-  font-size: 0.875rem;
-  color: color.$neutral-900;
-}
-
-.price-weight {
-  display: flex;
   justify-content: space-between;
-  width: 100%;
-  font-size: 1.125rem;
-  font-weight: 500;
+  padding: 0.45rem 1rem 0.45rem 1.5rem;
+  border-bottom: 1px solid color.$neutral-200;
+  background: color.$neutral-0;
+}
+
+.modal-label {
+  color: color.$green-600;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .close-button {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid color.$green-150;
+  border-radius: 50%;
+  background: color.$green-100;
+  color: color.$green-800;
   cursor: pointer;
+  font-size: 1.75rem;
+  line-height: 1;
+  transition:
+    background-color 140ms ease,
+    transform 140ms ease;
+
+  &:hover {
+    transform: scale(1.04);
+    background: color.$green-150;
+  }
+
+  &:focus-visible {
+    outline: 3px solid color.$green-400;
+    outline-offset: 2px;
+  }
+}
+
+.dish-image-frame {
+  width: 100%;
+  height: clamp(17.5rem, 35vh, 20rem);
+  flex: 0 0 auto;
+  overflow: hidden;
+  background: color.$green-100;
+}
+
+.dish-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 48%;
+}
+
+.image-placeholder {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  background: linear-gradient(135deg, color.$green-100, color.$neutral-100);
+  color: color.$green-800;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.dish-details {
+  padding: 1.6rem 2rem 2rem;
+}
+
+.dish-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.dish-title-group {
+  min-width: 0;
+}
+
+.section-eyebrow {
+  margin-bottom: 0.35rem;
+  color: color.$green-600;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dish-name {
+  color: color.$neutral-900;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.dish-price {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  padding-top: 0.15rem;
+
+  span {
+    color: color.$neutral-600;
+    font-size: 0.75rem;
+  }
+
+  strong {
+    color: color.$green-800;
+    font-size: 1.35rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+}
+
+.dish-description {
+  margin: 1rem 0 1.4rem;
+  color: color.$neutral-700;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.nutrition-title {
+  margin-bottom: 0.75rem;
+  color: color.$neutral-900;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.nutrition-item {
+  min-width: 0;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid color.$neutral-200;
+  border-radius: 0.75rem;
+  background: color.$neutral-100;
+
+  dt {
+    margin-bottom: 0.35rem;
+    color: color.$neutral-600;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  dd {
+    color: color.$neutral-900;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+}
+
+.vitamins-item {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .modal-content {
+    width: calc(100vw - 1rem);
+    max-width: calc(100vw - 1rem);
+    max-height: calc(100vh - 1rem);
+    max-height: calc(100dvh - 1rem);
+    border-radius: 1rem;
+  }
+
+  .modal-toolbar {
+    min-height: 3.25rem;
+    padding-right: 0.75rem;
+    padding-left: 1rem;
+  }
+
+  .close-button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .dish-image-frame {
+    height: clamp(10rem, 30vh, 15rem);
+  }
+
+  .dish-details {
+    padding: 1.25rem 1rem 1.5rem;
+  }
+
+  .dish-heading {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .dish-price {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.5rem;
+
+    strong {
+      font-size: 1.2rem;
+    }
+  }
+
+  .dish-description {
+    margin-top: 0.85rem;
+    font-size: 0.9rem;
+  }
+
+  .nutrition-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .nutrition-item {
+    padding: 0.7rem;
+  }
+
+  .vitamins-item {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-height: 700px) and (min-width: 641px) {
+  .dish-image-frame {
+    height: 17.5rem;
+  }
 }

@@ -8,6 +8,7 @@ using APIHandler.Repositories.GuestSessions;
 using APIHandler.Repositories.Reservations;
 using APIHandler.Repositories.Tables;
 using APIHandler.Services.Auth;
+using APIHandler.Services.GuestSessions;
 using APIHandler.Services.Locations;
 using System;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ public class GroupReservationService(
     ITableRepository tableRepository,
     IReservationRepository reservationRepository,
     IGuestSessionRepository guestSessionRepository,
+    IGuestSessionService guestSessionService,
     IUserService userService,
     ILocationService locationService) : IGroupReservationService
 {
@@ -36,9 +38,9 @@ public class GroupReservationService(
         Task<int> countTask = guestSessionRepository.CountByGroupReservationId(groupReservation.GroupReservationId);
 
         Reservation reservation = await reservationTask ?? throw new ValidationException("Associated reservation not found.");
-        int joinedGuestsCount = await countTask;
+        int currentParticipantCount = await countTask;
 
-        if (joinedGuestsCount + 1 >= reservation.GuestCount)
+        if (currentParticipantCount >= reservation.GuestCount)
             throw new GuestLimitExceededException();
 
         Table table = await tableRepository.GetTableAsync(reservation.TableId)
@@ -71,7 +73,7 @@ public class GroupReservationService(
         return groupReservation ?? throw new InvalidOperationException($"Group reservation with ID {groupReservationId} not found.");
     }
 
-    public async Task<GroupReservation> CreateGroupReservationAsync(string reservationId)
+    public async Task<GroupReservation> CreateGroupReservationAsync(string reservationId, string? ownerUserId = null)
     {
         var groupReservation = new GroupReservation
         {
@@ -82,6 +84,26 @@ public class GroupReservationService(
         };
 
         await groupReservationRepository.SaveGroupReservationAsync(groupReservation);
+
+        if (!string.IsNullOrWhiteSpace(ownerUserId))
+        {
+            try
+            {
+                await guestSessionService.CreateGroupOwnerSessionAsync(ownerUserId, groupReservation.GroupReservationId);
+            }
+            catch
+            {
+                var sessions = await guestSessionRepository.GetAllByGroupReservationIdAsync(groupReservation.GroupReservationId);
+                foreach (var session in sessions)
+                {
+                    await guestSessionRepository.DeleteAsync(session);
+                }
+
+                await groupReservationRepository.DeleteGroupReservationAsync(groupReservation);
+                throw;
+            }
+        }
+
         return groupReservation;
     }
 
@@ -89,9 +111,12 @@ public class GroupReservationService(
     {
         GroupReservation? group = await groupReservationRepository.GetByReservationIdAsync(reservationId);
         if (group is not null)
+        {
+            await guestSessionService.CreateGroupOwnerSessionAsync(userId, group.GroupReservationId);
             return;
+        }
 
-        await CreateGroupReservationAsync(reservationId);
+        await CreateGroupReservationAsync(reservationId, userId);
     }
 
     public async Task UpdateGroupReservationStatusAsync(string groupReservationId, GroupReservationStatus status)
